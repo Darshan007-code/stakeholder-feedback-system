@@ -17,6 +17,9 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve Frontend Static Files
+app.use(express.static(path.join(__dirname, '../frontend')));
+
 // Initialize Database
 initDb().then(() => console.log('Database initialized'));
 
