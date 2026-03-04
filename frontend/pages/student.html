@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | EduFeedback</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .dashboard-layout { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; }
+        .sidebar { background: #fff; padding: 1.5rem; border-radius: 1.5rem; border: 1px solid #e2e8f0; height: fit-content; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { margin-bottom: 0.5rem; }
+        .sidebar-menu a { display: block; padding: 0.75rem 1rem; text-decoration: none; color: var(--text); border-radius: 0.75rem; transition: all 0.2s; font-weight: 600; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: var(--primary); color: #fff; transform: translateX(5px); }
+        
+        .content-section { display: none; background: #fff; padding: 2.5rem; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .content-section.active { display: block; animation: fadeInUp 0.5s ease-out; }
+
+        /* --- High-End Description Box --- */
+        .description-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+            background: #fff;
+            border-radius: 1.5rem;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 1rem;
+        }
+
+        .description-container:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .description-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0 0.5rem;
+        }
+
+        .description-label {
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .char-counter {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 180px;
+            color: var(--text);
+            padding: 0.5rem;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+        }
+
+        .helper-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            padding-left: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* --- 3D Rating Slider --- */
+        .rating-card {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 1.25rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            outline: none;
+            accent-color: var(--primary);
+            margin: 1rem 0;
+        }
+
+        .status-badge { padding: 0.375rem 0.875rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">EduFeedback</div>
+            <ul class="nav-links">
+                <li><span id="user-name" style="font-weight: 700; color: var(--primary);">Student Name</span></li>
+                <li><a href="#" onclick="logout()" class="btn">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="dashboard-layout">
+            <aside class="sidebar">
+                <ul class="sidebar-menu">
+                    <li><a href="#" onclick="showSection('submit-feedback')" class="active" id="nav-submit-feedback"><i class="fas fa-pen-nib"></i> Submit Feedback</a></li>
+                    <li><a href="#" onclick="showSection('evaluate-teacher')" id="nav-evaluate-teacher"><i class="fas fa-chalkboard-teacher"></i> Evaluate Teacher</a></li>
+                    <li><a href="tickets.html" id="nav-track-tickets" style="background: #f0f9ff; color: #0369a1; margin-top: 1rem; border: 1px solid #bae6fd;"><i class="fas fa-ticket-alt"></i> Track My Tickets</a></li>
+                </ul>
+            </aside>
+
+            <div class="main-content">
+                <section id="submit-feedback" class="content-section active">
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 2.25rem; margin-bottom: 0.5rem;">New Feedback</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Your feedback helps us build a better campus environment.</p>
+                    
+                    <form id="feedback-form">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div class="form-group">
+                                <label><i class="fas fa-tag"></i> Category</label>
+                                <select id="fb-category" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-building"></i> Department</label>
+                                <select id="fb-department" required></select>
+                            </div>
+                        </div>
+                        
+                        <div class="rating-card">
+                            <label style="font-weight: 700; color: var(--text);"><i class="fas fa-star"></i> Overall Satisfaction</label>
+                            <input type="range" id="fb-rating" min="1" max="5" value="5">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; color: var(--primary);">
+                                <span>1 - Poor</span>
+                                <span id="rating-val" style="background: var(--primary); color: #fff; padding: 2px 8px; border-radius: 4px;">5</span>
+                                <span>5 - Excellent</span>
+                            </div>
+                        </div>
+
+                        <div class="description-container">
+                            <div class="description-header">
+                                <span class="description-label"><i class="fas fa-align-left"></i> Detailed Description</span>
+                                <span class="char-counter"><span id="char-count">0</span> / 1000</span>
+                            </div>
+                            <textarea id="fb-description" maxlength="1000" placeholder="Describe the issue or provide your suggestions in detail..." required></textarea>
+                        </div>
+                        <div class="helper-text">
+                            <i class="fas fa-info-circle"></i> Be specific to help us resolve the issue faster.
+                        </div>
+
+                        <div class="form-group" style="margin-top: 2rem;">
+                            <label><i class="fas fa-paperclip"></i> Supporting Evidence (Optional)</label>
+                            <div style="background: #f1f5f9; padding: 1rem; border-radius: 1rem; border: 2px dashed #cbd5e1; text-align: center; cursor: pointer;" onclick="document.getElementById('fb-attachment').click()">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem;"></i>
+                                <p style="font-size: 0.85rem; color: var(--text-muted);">Click to upload images or documents</p>
+                                <input type="file" id="fb-attachment" style="display: none;">
+                                <span id="file-name" style="font-size: 0.8rem; color: var(--primary); font-weight: 600; display: block; margin-top: 0.5rem;"></span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn" style="width: 100%; padding: 1.25rem; font-size: 1.1rem; margin-top: 2.5rem; border-radius: 1.25rem;">
+                            Submit Feedback <i class="fas fa-paper-plane" style="margin-left: 0.5rem;"></i>
+                        </button>
+                    </form>
+                </section>
+
+                <section id="evaluate-teacher" class="content-section">
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 2.25rem; margin-bottom: 0.5rem;">Teacher Evaluation</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Evaluate teaching quality and provide constructive feedback for your instructors.</p>
+                    
+                    <form id="evaluation-form">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div class="form-group">
+                                <label><i class="fas fa-university"></i> Select Department</label>
+                                <select id="ev-department" onchange="loadTeachersForDept(this.value)" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-user-tie"></i> Teacher Name</label>
+                                <select id="ev-teacher" required>
+                                    <option value="">Select teacher</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 2rem;">
+                            <label><i class="fas fa-book"></i> Subject</label>
+                            <select id="ev-subject" required>
+                                <option value="">Select subject</option>
+                            </select>
+                        </div>
+                        
+                        <div class="rating-card">
+                            <label style="font-weight: 700; color: var(--text);"><i class="fas fa-chalkboard-teacher"></i> Teaching Quality & Knowledge</label>
+                            <input type="range" id="ev-rating" min="1" max="5" value="5">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; color: var(--primary);">
+                                <span>1 - Poor</span>
+                                <span id="ev-rating-val" style="background: var(--primary); color: #fff; padding: 2px 8px; border-radius: 4px;">5</span>
+                                <span>5 - Excellent</span>
+                            </div>
+                        </div>
+
+                        <div class="description-container">
+                            <div class="description-header">
+                                <span class="description-label"><i class="fas fa-comment-dots"></i> Constructive Comments</span>
+                                <span class="char-counter"><span id="ev-char-count">0</span> / 500</span>
+                            </div>
+                            <textarea id="ev-comments" maxlength="500" placeholder="What did you like? What can be improved? Please be specific..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn" style="width: 100%; padding: 1.25rem; font-size: 1.1rem; margin-top: 2rem; border-radius: 1.25rem;">
+                            Submit Evaluation <i class="fas fa-check-circle" style="margin-left: 0.5rem;"></i>
+                        </button>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/app.js"></script>
+    <script>
+        const auth = checkAuth('student');
+        let metadata = null;
+
+        if (auth) {
+            document.getElementById('user-name').innerText = auth.user.name;
+            init();
+        }
+
+        // Real-time character counter
+        const textarea = document.getElementById('fb-description');
+        const counter = document.getElementById('char-count');
+        textarea.addEventListener('input', () => {
+            counter.innerText = textarea.value.length;
+        });
+
+        const evTextarea = document.getElementById('ev-comments');
+        const evCounter = document.getElementById('ev-char-count');
+        evTextarea.addEventListener('input', () => {
+            evCounter.innerText = evTextarea.value.length;
+        });
+
+        // Rating value indicator
+        const ratingInput = document.getElementById('fb-rating');
+        const ratingVal = document.getElementById('rating-val');
+        ratingInput.addEventListener('input', () => {
+            ratingVal.innerText = ratingInput.value;
+        });
+
+        const evRatingInput = document.getElementById('ev-rating');
+        const evRatingVal = document.getElementById('ev-rating-val');
+        evRatingInput.addEventListener('input', () => {
+            evRatingVal.innerText = evRatingInput.value;
+        });
+
+        // File name display
+        document.getElementById('fb-attachment').addEventListener('change', (e) => {
+            const fileName = e.target.files[0] ? e.target.files[0].name : "";
+            document.getElementById('file-name').innerText = fileName;
+        });
+
+        async function init() {
+            const res = await fetch(`${API_URL}/metadata`);
+            metadata = await res.json();
+            const fbCat = document.getElementById('fb-category');
+            metadata.categories.forEach(c => fbCat.innerHTML += `<option value="${c}">${c}</option>`);
+            const fbDept = document.getElementById('fb-department');
+            const evDept = document.getElementById('ev-department');
+            metadata.departments.forEach(d => {
+                const opt = `<option value="${d}">${d}</option>`;
+                fbDept.innerHTML += opt;
+                evDept.innerHTML += opt;
+            });
+            if (metadata.departments.length) loadTeachersForDept(metadata.departments[0]);
+        }
+
+        async function loadTeachersForDept(dept) {
+            const res = await fetch(`${API_URL}/teachers/${encodeURIComponent(dept)}`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            const teachers = await res.json();
+            const teacherSelect = document.getElementById('ev-teacher');
+            teacherSelect.innerHTML = '<option value="">Select a teacher</option>';
+            teachers.forEach(t => teacherSelect.innerHTML += `<option value="${t.teacher_id}">${t.name}</option>`);
+            const subjectSelect = document.getElementById('ev-subject');
+            subjectSelect.innerHTML = '<option value="">Select a subject</option>';
+            (metadata.subjects[dept] || []).forEach(s => subjectSelect.innerHTML += `<option value="${s}">${s}</option>`);
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+            document.getElementById('nav-' + sectionId).classList.add('active');
+        }
+
+        document.getElementById('feedback-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('category', document.getElementById('fb-category').value);
+            formData.append('department', document.getElementById('fb-department').value);
+            formData.append('rating', document.getElementById('fb-rating').value);
+            formData.append('description', document.getElementById('fb-description').value);
+            formData.append('is_anonymous', 'false');
+            
+            const fileInput = document.getElementById('fb-attachment');
+            if (fileInput.files[0]) formData.append('attachment', fileInput.files[0]);
+
+            try {
+                const res = await fetch(`${API_URL}/feedback`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    alert('Success! Your feedback has been recorded.');
+                    e.target.reset();
+                    document.getElementById('char-count').innerText = "0";
+                    document.getElementById('file-name').innerText = "";
+                } else {
+                    alert('Error: Could not submit feedback. Please try again.');
+                }
+            } catch (err) {
+                alert('Connection error. Is the server running?');
+            }
+        });
+
+        document.getElementById('evaluation-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const body = {
+                teacher_id: document.getElementById('ev-teacher').value,
+                subject: document.getElementById('ev-subject').value,
+                ratings: { teaching_quality: parseInt(document.getElementById('ev-rating').value) },
+                comments: document.getElementById('ev-comments').value
+            };
+            
+            try {
+                const res = await fetch(`${API_URL}/evaluation`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (res.ok) {
+                    alert('Evaluation submitted successfully!');
+                    e.target.reset();
+                    document.getElementById('ev-char-count').innerText = "0";
+                } else {
+                    alert('Submission failed');
+                }
+            } catch (err) {
+                alert('Error submitting evaluation');
+            }
+        });
+    </script>
+</body>
+</html>

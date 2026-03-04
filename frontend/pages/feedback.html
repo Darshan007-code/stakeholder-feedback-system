@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Feedback | EduFeedback</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { background: radial-gradient(circle at top right, #f8fafc, #e2e8f0); min-height: 100vh; }
+        
+        .form-wrapper { max-width: 700px; margin: 4rem auto; padding: 0 1.5rem; animation: fadeInUp 0.8s cubic-bezier(0.23, 1, 0.32, 1); }
+        
+        .form-container { 
+            background: #fff; 
+            padding: 3.5rem; 
+            border-radius: 2.5rem; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); 
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 6px;
+            background: linear-gradient(to right, var(--primary), #9333ea);
+        }
+
+        .form-header { text-align: center; margin-bottom: 3rem; }
+        .form-header h2 { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 900; color: var(--text); margin-bottom: 0.5rem; }
+        .form-header p { color: var(--text-muted); font-size: 1.1rem; }
+
+        /* Modern Toggle Switch */
+        .anon-card {
+            background: #f8fafc;
+            padding: 1.25rem 1.5rem;
+            border-radius: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .anon-card:hover { border-color: var(--primary-light); background: #f0f9ff; }
+        .anon-card.active { border-color: var(--primary); background: #f0f9ff; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        /* Premium Description Box */
+        .description-box {
+            border: 2px solid #e2e8f0;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fdfdfd;
+        }
+        .description-box:focus-within {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 10px 25px -10px rgba(79, 70, 229, 0.2);
+            transform: translateY(-3px);
+        }
+        textarea {
+            width: 100%; border: none; background: transparent; font-family: inherit; font-size: 1.1rem;
+            resize: vertical; min-height: 200px; outline: none; line-height: 1.6; color: var(--text);
+        }
+
+        .upload-zone {
+            margin-top: 2rem;
+            border: 2px dashed #cbd5e1;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #f8fafc;
+        }
+        .upload-zone:hover { border-color: var(--primary); background: #f0f9ff; }
+        .upload-zone i { font-size: 2rem; color: var(--primary); margin-bottom: 1rem; }
+
+        .rating-visual {
+            display: flex; gap: 0.75rem; justify-content: center; margin: 1.5rem 0;
+        }
+        .star-btn { 
+            font-size: 1.75rem; color: #e2e8f0; cursor: pointer; transition: all 0.2s; 
+        }
+        .star-btn.active { color: #f59e0b; transform: scale(1.2); }
+
+        .back-nav { margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">EduFeedback</div>
+            <div class="nav-links">
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="form-wrapper">
+        <div class="back-nav">
+            <a id="back-link" href="#" class="btn back-btn">← Back to Dashboard</a>
+        </div>
+
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Submit Feedback</h2>
+                <p>Help us improve by sharing your experience</p>
+            </div>
+
+            <form id="feedback-form" enctype="multipart/form-data">
+                <!-- Anonymous Toggle -->
+                <div class="anon-card" onclick="document.getElementById('is_anonymous').click()">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-user-secret" style="font-size: 1.5rem; color: var(--primary);"></i>
+                        <div>
+                            <div style="font-weight: 700; color: var(--text);">Post Anonymously</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Hide your identity from administrators</div>
+                        </div>
+                    </div>
+                    <label class="switch" onclick="event.stopPropagation()">
+                        <input type="checkbox" id="is_anonymous">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="form-group">
+                        <label><i class="fas fa-list-ul"></i> Category</label>
+                        <select id="category" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-building"></i> Department</label>
+                        <select id="department" required></select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="text-align: center; margin-bottom: 3rem;">
+                    <label style="font-size: 1rem; font-weight: 800; color: var(--text);">Overall Rating</label>
+                    <div class="rating-visual" id="star-rating">
+                        <i class="fas fa-star star-btn" data-val="1"></i>
+                        <i class="fas fa-star star-btn" data-val="2"></i>
+                        <i class="fas fa-star star-btn" data-val="3"></i>
+                        <i class="fas fa-star star-btn" data-val="4"></i>
+                        <i class="fas fa-star star-btn" data-val="5"></i>
+                    </div>
+                    <input type="hidden" id="rating" value="5">
+                    <div id="rating-desc" style="font-weight: 700; color: var(--primary); font-size: 0.9rem;">Excellent</div>
+                </div>
+
+                <div class="description-box">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                        <span style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--primary);"><i class="fas fa-pen-fancy"></i> Details</span>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;"><span id="char-count">0</span> / 1000</span>
+                    </div>
+                    <textarea id="description" placeholder="Provide a clear and detailed description..." required maxlength="1000"></textarea>
+                </div>
+
+                <div class="upload-zone" onclick="document.getElementById('attachment').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <div style="font-weight: 700; color: var(--text);">Attach Supporting Files</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Images or PDFs (Optional)</div>
+                    <input type="file" id="attachment" style="display: none;">
+                    <div id="file-name" style="margin-top: 1rem; font-weight: 700; color: var(--primary); font-size: 0.9rem;"></div>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; padding: 1.25rem; font-size: 1.25rem; margin-top: 3rem; border-radius: 1.5rem;">
+                    Submit Feedback <i class="fas fa-paper-plane" style="margin-left: 0.75rem;"></i>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script src="../js/app.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!token) window.location.href = 'login.html';
+        document.getElementById('back-link').href = `${user.role}.html`;
+
+        // Star Rating Logic
+        const stars = document.querySelectorAll('.star-btn');
+        const ratingDesc = document.getElementById('rating-desc');
+        const descs = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"];
+        
+        function updateStars(val) {
+            stars.forEach(s => {
+                s.classList.toggle('active', s.dataset.val <= val);
+            });
+            document.getElementById('rating').value = val;
+            ratingDesc.innerText = descs[val];
+        }
+        updateStars(5);
+
+        stars.forEach(s => {
+            s.addEventListener('click', () => updateStars(s.dataset.val));
+        });
+
+        // Anonymous Toggle Visuals
+        const anonCheckbox = document.getElementById('is_anonymous');
+        const anonCard = document.querySelector('.anon-card');
+        anonCheckbox.addEventListener('change', () => {
+            anonCard.classList.toggle('active', anonCheckbox.checked);
+        });
+
+        // Char Counter
+        const textarea = document.getElementById('description');
+        textarea.addEventListener('input', () => {
+            document.getElementById('char-count').innerText = textarea.value.length;
+        });
+
+        // File Display
+        document.getElementById('attachment').addEventListener('change', (e) => {
+            document.getElementById('file-name').innerText = e.target.files[0] ? `Selected: ${e.target.files[0].name}` : "";
+        });
+
+        async function init() {
+            const res = await fetch(`${API_URL}/metadata`);
+            const data = await res.json();
+            const catSelect = document.getElementById('category');
+            data.categories.forEach(c => catSelect.innerHTML += `<option value="${c}">${c}</option>`);
+            const deptSelect = document.getElementById('department');
+            data.departments.forEach(d => deptSelect.innerHTML += `<option value="${d}">${d}</option>`);
+        }
+
+        document.getElementById('feedback-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('category', document.getElementById('category').value);
+            formData.append('department', document.getElementById('department').value);
+            formData.append('rating', document.getElementById('rating').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('is_anonymous', document.getElementById('is_anonymous').checked);
+            
+            const fileInput = document.getElementById('attachment');
+            if (fileInput.files[0]) formData.append('attachment', fileInput.files[0]);
+
+            const submitBtn = e.target.querySelector('button');
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Submitting...';
+
+            try {
+                const response = await fetch(`${API_URL}/feedback`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Feedback submitted successfully!');
+                    window.location.href = `${user.role}.html`;
+                } else {
+                    alert('Failed to submit.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Submit Feedback';
+                }
+            } catch (err) {
+                alert('Connection error.');
+                submitBtn.disabled = false;
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>

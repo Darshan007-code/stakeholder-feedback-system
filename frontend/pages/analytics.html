@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Insights | EduFeedback Analytics</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #f8fafc; }
+        .analytics-wrapper { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .analytics-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+        .analytics-header h1 { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 900; color: var(--text); }
+        .analytics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem; perspective: 1000px; }
+        .chart-card { background: #fff; padding: 2.5rem; border-radius: 2rem; border: 1px solid var(--border); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); display: flex; flex-direction: column; transform-style: preserve-3d; }
+        .chart-card:hover { transform: translateY(-10px) rotateX(2deg) rotateY(2deg); box-shadow: 0 30px 60px -12px rgba(79, 70, 229, 0.15); border-color: var(--primary-light); }
+        .chart-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; transform: translateZ(30px); }
+        .chart-header h3 { font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: #334155; }
+        .chart-icon { width: 40px; height: 40px; border-radius: 0.75rem; background: rgba(79, 70, 229, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; }
+        .canvas-container { position: relative; height: 350px; width: 100%; transform: translateZ(20px); }
+        @media (max-width: 1024px) { .analytics-grid { grid-template-columns: 1fr; } }
+        .back-nav { margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav><div class="logo">EduFeedback</div><div class="nav-links"><a href="#" onclick="logout()">Sign Out</a></div></nav>
+    </header>
+
+    <main class="analytics-wrapper">
+        <div class="back-nav"><a href="admin.html" class="btn back-btn"><i class="fas fa-arrow-left"></i> Return to Tickets</a></div>
+
+        <div class="analytics-header">
+            <h1>System Insights</h1>
+            <button onclick="window.print()" class="btn-outline" style="padding: 0.5rem 1.25rem; border-radius: 1rem;"><i class="fas fa-print"></i> Print Report</button>
+        </div>
+
+        <div class="analytics-grid">
+            <!-- 1. Department Performance -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <h3>Complaints per Department</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Distribution of feedback across departmental teams</p>
+                    </div>
+                    <div class="chart-icon"><i class="fas fa-building"></i></div>
+                </div>
+                <div class="canvas-container"><canvas id="deptChart"></canvas></div>
+            </div>
+
+            <!-- 2. Teacher Quality -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <h3>Teacher Performance</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Average ratings from student evaluations</p>
+                    </div>
+                    <div class="chart-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fas fa-star"></i></div>
+                </div>
+                <div class="canvas-container"><canvas id="teacherChart"></canvas></div>
+            </div>
+
+            <!-- 3. Submission Trends -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <h3>Feedback Velocity</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Monthly submission trends over time</p>
+                    </div>
+                    <div class="chart-icon" style="background: rgba(147, 51, 234, 0.1); color: #9333ea;"><i class="fas fa-chart-line"></i></div>
+                </div>
+                <div class="canvas-container"><canvas id="monthlyChart"></canvas></div>
+            </div>
+
+            <!-- 4. Category Mix -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <h3>Topic Distribution</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Feedback breakdown by primary category</p>
+                    </div>
+                    <div class="chart-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;"><i class="fas fa-pie-chart"></i></div>
+                </div>
+                <div class="canvas-container"><canvas id="categoryChart"></canvas></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/app.js"></script>
+    <script>
+        const auth = checkAuth('admin');
+        const colors = { primary: '#4f46e5', success: '#10b981', purple: '#9333ea', warning: '#f59e0b', danger: '#ef4444', light: '#f1f5f9' };
+
+        if (auth) loadCharts();
+
+        async function loadCharts() {
+            const headers = { 'Authorization': `Bearer ${localStorage.getItem('token')}` };
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b';
+
+            // 1. Dept Complaints
+            const deptRes = await fetch(`${API_URL}/admin/analytics/department-complaints`, { headers });
+            const deptData = await deptRes.json();
+            new Chart(document.getElementById('deptChart'), {
+                type: 'bar',
+                data: { labels: deptData.map(d => d.assigned_department), datasets: [{ label: 'Tickets', data: deptData.map(d => d.count), backgroundColor: colors.primary, borderRadius: 12 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // 2. Teacher Performance
+            const teacherRes = await fetch(`${API_URL}/admin/analytics/teacher-ratings`, { headers });
+            const teacherData = await teacherRes.json();
+            new Chart(document.getElementById('teacherChart'), {
+                type: 'bar',
+                data: { labels: teacherData.map(t => t.name), datasets: [{ label: 'Avg Rating', data: teacherData.map(t => t.averageRating), backgroundColor: colors.success, borderRadius: 12 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { min: 0, max: 5 } } }
+            });
+
+            // 3. Feedback Velocity
+            const monthRes = await fetch(`${API_URL}/admin/analytics/monthly-feedback`, { headers });
+            const monthData = await monthRes.json();
+            new Chart(document.getElementById('monthlyChart'), {
+                type: 'line',
+                data: { labels: monthData.map(m => m.month), datasets: [{ label: 'Submissions', data: monthData.map(m => m.count), borderColor: colors.purple, backgroundColor: 'rgba(147, 51, 234, 0.1)', fill: true, tension: 0.4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // 4. Topic Distribution
+            const catRes = await fetch(`${API_URL}/admin/analytics/category-distribution`, { headers });
+            const catData = await catRes.json();
+            new Chart(document.getElementById('categoryChart'), {
+                type: 'doughnut',
+                data: { labels: catData.map(c => c.category), datasets: [{ data: catData.map(c => c.count), backgroundColor: [colors.primary, colors.success, colors.purple, colors.warning, '#6366f1', colors.danger], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } }, cutout: '70%' }
+            });
+        }
+    </script>
+</body>
+</html>

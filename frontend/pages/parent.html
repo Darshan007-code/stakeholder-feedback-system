@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Portal | EduFeedback</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-layout { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; }
+        .sidebar { background: #fff; padding: 1.5rem; border-radius: 1.5rem; border: 1px solid #e2e8f0; height: fit-content; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { margin-bottom: 0.5rem; }
+        .sidebar-menu a { display: block; padding: 0.75rem 1rem; text-decoration: none; color: var(--text); border-radius: 0.75rem; transition: all 0.2s; font-weight: 600; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: var(--primary); color: #fff; transform: translateX(5px); }
+        
+        .content-section { display: none; background: #fff; padding: 2.5rem; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .content-section.active { display: block; animation: fadeInUp 0.5s ease-out; }
+
+        .description-container { position: relative; margin-bottom: 1.5rem; background: #fff; border-radius: 1.5rem; border: 2px solid #e2e8f0; padding: 1rem; transition: all 0.3s ease; }
+        .description-container:focus-within { border-color: var(--primary); transform: translateY(-2px); }
+        textarea { width: 100%; border: none; background: transparent; font-family: inherit; font-size: 1rem; resize: vertical; min-height: 180px; outline: none; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">EduFeedback</div>
+            <ul class="nav-links">
+                <li><span id="user-name" style="font-weight: 700; color: var(--primary);">Parent Name</span></li>
+                <li><a href="#" onclick="logout()" class="btn">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="dashboard-layout" style="max-width: 1300px; margin: 3rem auto; padding: 0 2rem;">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#" onclick="showSection('submit-feedback')" class="active" id="nav-submit-feedback"><i class="fas fa-edit"></i> Submit Feedback</a></li>
+                <li><a href="tickets.html" id="nav-track-tickets"><i class="fas fa-history"></i> Track Complaints</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <section id="submit-feedback" class="content-section active">
+                <h2 style="font-family: 'Outfit', sans-serif; font-size: 2.25rem; margin-bottom: 0.5rem;">Parent Feedback</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Share your concerns or suggestions regarding campus facilities and safety.</p>
+                
+                <form id="feedback-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div class="form-group">
+                            <label><i class="fas fa-th-large"></i> Category</label>
+                            <select id="fb-category" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Area/Dept.</label>
+                            <select id="fb-department" required></select>
+                        </div>
+                    </div>
+
+                    <div class="description-container">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                            <span style="font-weight: 800; font-size: 0.85rem; color: var(--primary); text-transform: uppercase;">Message</span>
+                        </div>
+                        <textarea id="fb-description" placeholder="Describe your feedback in detail..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn" style="width: 100%; padding: 1.25rem; font-size: 1.1rem; border-radius: 1.25rem;">
+                        Submit Feedback <i class="fas fa-paper-plane" style="margin-left: 0.5rem;"></i>
+                    </button>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <script src="../js/app.js"></script>
+    <script>
+        const auth = checkAuth('parent'); // Corrected role check
+        if (auth) {
+            document.getElementById('user-name').innerText = auth.user.name;
+            init();
+        }
+
+        async function init() {
+            const res = await fetch(`${API_URL}/metadata`);
+            const data = await res.json();
+            const fbCat = document.getElementById('fb-category');
+            data.categories.forEach(c => fbCat.innerHTML += `<option value="${c}">${c}</option>`);
+            const fbDept = document.getElementById('fb-department');
+            data.departments.forEach(d => fbDept.innerHTML += `<option value="${d}">${d}</option>`);
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+            document.getElementById('nav-' + sectionId).classList.add('active');
+        }
+
+        document.getElementById('feedback-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await fetch(`${API_URL}/feedback`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({
+                    category: document.getElementById('fb-category').value,
+                    department: document.getElementById('fb-department').value,
+                    description: document.getElementById('fb-description').value,
+                    rating: 5,
+                    is_anonymous: 'false'
+                })
+            });
+            if (res.ok) { alert('Feedback submitted!'); e.target.reset(); }
+        });
+    </script>
+</body>
+</html>

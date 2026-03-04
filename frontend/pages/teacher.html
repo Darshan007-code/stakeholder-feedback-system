@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Portal | EduFeedback</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-layout { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; }
+        .sidebar { background: #fff; padding: 1.5rem; border-radius: 1.5rem; border: 1px solid #e2e8f0; height: fit-content; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { margin-bottom: 0.5rem; }
+        .sidebar-menu a { display: block; padding: 0.75rem 1rem; text-decoration: none; color: var(--text); border-radius: 0.75rem; transition: all 0.2s; font-weight: 600; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: var(--primary); color: #fff; transform: translateX(5px); }
+        
+        .content-section { display: none; background: #fff; padding: 2.5rem; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .content-section.active { display: block; animation: fadeInUp 0.5s ease-out; }
+
+        /* Premium Summary Card */
+        .summary-card { 
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            padding: 2.5rem; border-radius: 1.5rem; border: 1px solid var(--border);
+            text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            position: relative; overflow: hidden;
+        }
+        .summary-card::after {
+            content: ""; position: absolute; top: 0; right: 0; width: 100px; height: 100px;
+            background: var(--primary); opacity: 0.05; border-radius: 0 0 0 100%;
+        }
+        .score-value { font-family: 'Outfit', sans-serif; font-size: 4rem; font-weight: 900; color: var(--primary); line-height: 1; margin: 1rem 0; }
+        .rating-bar-container { height: 12px; background: #e2e8f0; border-radius: 6px; margin: 1.5rem 0; overflow: hidden; }
+        .rating-fill { height: 100%; background: linear-gradient(to right, var(--primary), #9333ea); border-radius: 6px; transition: width 1s ease-out; }
+
+        .description-container { position: relative; margin-bottom: 1.5rem; background: #fff; border-radius: 1.5rem; border: 2px solid #e2e8f0; padding: 1rem; transition: all 0.3s ease; }
+        .description-container:focus-within { border-color: var(--primary); transform: translateY(-2px); }
+        textarea { width: 100%; border: none; background: transparent; font-family: inherit; font-size: 1rem; resize: vertical; min-height: 180px; outline: none; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">EduFeedback</div>
+            <ul class="nav-links">
+                <li><span id="user-name" style="font-weight: 700; color: var(--primary);">Teacher Name</span></li>
+                <li><a href="#" onclick="logout()" class="btn">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="dashboard-layout" style="max-width: 1300px; margin: 3rem auto; padding: 0 2rem;">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#" onclick="showSection('internal-feedback')" class="active" id="nav-internal-feedback"><i class="fas fa-comment-alt"></i> Internal Feedback</a></li>
+                <li><a href="#" onclick="showSection('course-summary')" id="nav-course-summary"><i class="fas fa-chart-line"></i> Performance Insights</a></li>
+                <li><a href="tickets.html" id="nav-track-tickets" style="margin-top: 1rem; background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd;"><i class="fas fa-history"></i> My Submissions</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <!-- Internal Feedback Section -->
+            <section id="internal-feedback" class="content-section active">
+                <h2 style="font-family: 'Outfit', sans-serif; font-size: 2.25rem; margin-bottom: 0.5rem;">Administrative Feedback</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Report infrastructure needs or suggest administrative improvements to the management.</p>
+                
+                <form id="internal-fb-form">
+                    <div class="form-group" style="max-width: 400px; margin-bottom: 2rem;">
+                        <label><i class="fas fa-list-ul"></i> Category</label>
+                        <select id="fb-category" required></select>
+                    </div>
+
+                    <div class="description-container">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                            <span style="font-weight: 800; font-size: 0.85rem; color: var(--primary); text-transform: uppercase;">Feedback Details</span>
+                        </div>
+                        <textarea id="fb-description" placeholder="Describe the improvement or issue in detail..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn" style="width: 100%; padding: 1.25rem; font-size: 1.1rem; border-radius: 1.25rem;">
+                        Submit Feedback <i class="fas fa-paper-plane" style="margin-left: 0.5rem;"></i>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Course Summary Section -->
+            <section id="course-summary" class="content-section">
+                <h2 style="font-family: 'Outfit', sans-serif; font-size: 2.25rem; margin-bottom: 0.5rem;">Performance Insights</h2>
+                <p style="color: var(--text-muted); margin-bottom: 3rem;">View your aggregate ratings based on anonymous student evaluations.</p>
+                
+                <div id="summary-content">
+                    <p style="text-align: center; color: var(--text-muted);">Fetching your latest metrics...</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="../js/app.js"></script>
+    <script>
+        const auth = checkAuth('teacher');
+        if (auth) {
+            document.getElementById('user-name').innerText = auth.user.name;
+            loadMetadata();
+        }
+
+        async function loadMetadata() {
+            const res = await fetch(`${API_URL}/metadata`);
+            const data = await res.json();
+            const fbCat = document.getElementById('fb-category');
+            data.categories.forEach(c => fbCat.innerHTML += `<option value="${c}">${c}</option>`);
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+            document.getElementById('nav-' + sectionId).classList.add('active');
+            if (sectionId === 'course-summary') loadCourseSummary();
+        }
+
+        async function loadCourseSummary() {
+            const res = await fetch(`${API_URL}/admin/analytics/teacher-ratings`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            const data = await res.json();
+            const container = document.getElementById('summary-content');
+            container.innerHTML = '';
+            
+            const myData = data.find(t => t.name === auth.user.name);
+            if (!myData) {
+                container.innerHTML = '<div class="summary-card"><p>No student evaluations received yet. Performance data will appear here once students submit their feedback.</p></div>';
+                return;
+            }
+
+            const percent = (myData.averageRating / 5) * 100;
+            container.innerHTML = `
+                <div class="summary-card">
+                    <h3 style="font-weight: 800; color: #64748b; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.1em;">Overall Quality Score</h3>
+                    <div class="score-value">${myData.averageRating}</div>
+                    <div style="font-weight: 700; color: var(--text-muted);">OUT OF 5.0</div>
+                    
+                    <div class="rating-bar-container">
+                        <div class="rating-fill" style="width: 0%"></div>
+                    </div>
+                    
+                    <p style="margin-top: 2rem; font-size: 0.95rem; color: #475569;">
+                        <i class="fas fa-info-circle" style="color: var(--primary);"></i> This score is a weighted average of teaching quality, subject knowledge, and punctuality ratings submitted anonymously by your students.
+                    </p>
+                </div>
+            `;
+            
+            // Animate bar
+            setTimeout(() => {
+                container.querySelector('.rating-fill').style.width = percent + '%';
+            }, 100);
+        }
+
+        document.getElementById('internal-fb-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await fetch(`${API_URL}/feedback`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify({
+                    category: document.getElementById('fb-category').value,
+                    department: 'Administration',
+                    description: document.getElementById('fb-description').value,
+                    rating: 5,
+                    is_anonymous: 'false'
+                })
+            });
+            if (res.ok) { alert('Internal feedback submitted!'); e.target.reset(); }
+        });
+    </script>
+</body>
+</html>
