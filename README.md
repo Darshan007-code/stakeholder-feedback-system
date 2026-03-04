@@ -71,7 +71,9 @@ Simply open `frontend/index.html` in your browser, or use the **Live Server** ex
 ---
 
 ## 📸 Screenshots
-*(Add your screenshots here to make the README even better!)*
+
+### Homepage (3D Stakeholder Grid)
+![Homepage Dashboard](docs/screenshots/homepage.png)
 
 ---
 

@@ -164,7 +164,7 @@ nav {
 
 .card {
     background: #fff;
-    padding: 1.5rem; /* Reduced padding */
+    padding: 1.5rem;
     border-radius: 2rem;
     border: 1px solid var(--border);
     box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05);
@@ -174,10 +174,24 @@ nav {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between; /* Better vertical distribution */
     aspect-ratio: 1 / 1;
     width: 100%;
-    min-width: 0; /* Allows card to shrink if needed */
+    min-width: 0;
+}
+
+.card-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(79, 70, 229, 0.1);
+    color: var(--primary);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    transform: translateZ(30px);
 }
 
 .card:hover {
@@ -187,34 +201,35 @@ nav {
 }
 
 .card h3 {
-    font-size: 1.4rem; /* Slightly smaller title */
+    font-size: 1.35rem; /* Balanced size */
     font-weight: 800;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     color: var(--text);
     transform: translateZ(40px);
 }
 
 .card p {
     color: var(--text-muted);
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem; /* Slightly smaller text */
+    margin-bottom: 1rem;
+    font-size: 0.85rem; /* Tighter text for square fit */
     line-height: 1.4;
     transform: translateZ(25px);
+    max-width: 90%;
 }
 
 /* Access Portal Button Specific Styling */
 .card .btn-outline {
-    margin-top: 0;
-    width: 90%; /* Slightly smaller width to fit in square */
-    padding: 0.6rem 1rem;
+    width: 100%;
+    white-space: nowrap; /* Force one line */
+    padding: 0.6rem 0.5rem; /* Narrower horizontal padding */
     border-radius: 1rem;
     background: #fff;
     border: 2px solid var(--primary);
     color: var(--primary);
     font-weight: 800;
     text-transform: uppercase;
-    font-size: 0.75rem; /* Smaller button text */
-    letter-spacing: 0.05em;
+    font-size: 0.7rem; /* Optimized for single line */
+    letter-spacing: 0.02em;
     transform: translateZ(50px);
     box-shadow: 0 4px 0px var(--primary);
     transition: all 0.2s ease;
