@@ -1,35 +1,56 @@
-# Stakeholder Feedback System - Requirements Document
+# Stakeholder Feedback System - Comprehensive Requirements
 
 ## 1. Project Overview
-A comprehensive platform designed to collect, track, and analyze feedback from various stakeholders within an educational or organizational ecosystem. The system aims to improve transparency, accountability, and service quality through structured feedback loops.
+A premium, full-stack feedback management ecosystem designed for educational institutions. The system provides a structured loop for collecting, tracking, and analyzing feedback from all institutional stakeholders while maintaining high standards of UI/UX and data integrity.
 
-## 2. Stakeholder Roles
-- **Students**: Primary users who submit feedback on academic and campus life.
-- **Parents**: Monitor and provide feedback regarding their child's education, safety, and institutional facilities.
-- **Teachers**: Provide feedback on infrastructure and administration; subject to evaluation by other stakeholders.
-- **Employees**: Staff members who provide feedback on workplace conditions and administration.
-- **Admin**: System overseers who manage ticket resolution, view advanced analytics, and maintain the platform.
+## 2. Stakeholder Roles & Access
+- **Students**: 
+    - Login via USN (Case-insensitive).
+    - Submit feedback with ratings and attachments.
+    - Evaluate teachers on quality, knowledge, and punctuality.
+    - Track personal ticket status in real-time.
+- **Parents**: 
+    - Login via Parent ID.
+    - Submit feedback regarding campus facilities, safety, and transport.
+    - Track complaints.
+- **Teachers**: 
+    - Login via Employee ID.
+    - Submit internal administrative feedback.
+    - View anonymous "Performance Insights" (aggregate scores from students).
+- **Employees**: 
+    - Login via Employee ID.
+    - Report operational and infrastructure problems.
+- **Admins**: 
+    - Login via Admin ID.
+    - Full ticket management (Assign Dept, Update Status, Add Resolution).
+    - Register new stakeholders (Students, Teachers, staff) via Dashboard.
+    - View advanced Analytics (Charts).
+    - Export system data to CSV.
 
-## 3. Feedback Categories
-All feedback must be categorized into one of the following:
-- **Academic**: Curriculum, teaching quality, and learning resources.
-- **Infrastructure**: Buildings, classrooms, labs, and equipment.
-- **Hostel**: Accommodation, food, and living conditions.
-- **Transport**: Bus services, schedules, and safety.
-- **Administration**: Fees, documentation, and office responsiveness.
-- **Examinations**: Scheduling, grading, and conduct.
-- **Library**: Book availability, study spaces, and digital resources.
-- **Safety**: Security personnel, emergency protocols, and campus environment.
+## 3. Core Functional Requirements
+### 3.1 Feedback & Ticket System
+- **Unified Form**: Reusable submission interface with category, department, and 1-5 star ratings.
+- **Evidence Support**: Capability to upload images/PDFs as supporting documentation.
+- **Privacy**: Support for **Anonymous Mode** to protect users during sensitive reporting.
+- **Lifecycle Management**: Tickets transition through *Open* → *Under Review* → *In Progress* → *Resolved* → *Closed*.
 
-## 4. Feature List
-### 4.1 Core Functions
-- **Feedback Submission**: Secure forms for all stakeholders to submit categorized feedback.
-- **Ticket Tracking**: A personal dashboard for users to view the status (Open, In Progress, Resolved) of their submitted complaints.
-- **Teacher Evaluation**: A dedicated module for stakeholders to assess teacher performance based on predefined metrics.
-- **Ticket Resolution**: Admin-side tools to assign tickets, update status, and provide resolution comments.
-- **Admin Analytics**: Data visualization (charts/graphs) showing feedback trends, category distribution, and resolution efficiency.
+### 3.2 Analytics & Reporting
+- **Departmental Load**: Visual breakdown of tickets per department.
+- **Teacher Performance**: Average rating trends for each faculty member.
+- **Feedback Velocity**: Monthly submission volume tracking.
+- **Category Mix**: Doughnut charts showing topic distribution.
+- **Exporting**: Capability to download filtered reports in CSV format.
 
-### 4.2 Technical Requirements
-- **Authentication**: Role-based access control (RBAC) to ensure users only see relevant data.
-- **Real-time Updates**: Notifications when a ticket status changes.
-- **Data Integrity**: Secure storage of sensitive feedback and evaluations.
+### 3.3 Notifications
+- **Dashboard Alerts**: Real-time notifications for feedback submission and status updates.
+- **Email Simulation**: Backend logging of email dispatches for user updates.
+
+## 4. Non-Functional & Technical Requirements
+- **UI/UX**: High-end 3D design system using "Outfit" display typography and smooth entrance animations.
+- **Responsiveness**: Mobile-first design ensuring usability on phones and tablets.
+- **Security**: 
+    - JWT-based session management.
+    - Password hashing using Bcrypt.
+    - Role-Based Access Control (RBAC) preventing unauthorized data access.
+- **Database**: SQLite3 for portability, managed via Knex.js for structured schema handling.
+- **API**: RESTful architecture built with Node.js/Express.
