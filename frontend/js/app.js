@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://edufeedback-system-jc9d.onrender.com/api';
 
 function checkAuth(role) {
     const token = localStorage.getItem('token');
