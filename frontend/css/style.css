@@ -348,3 +348,12 @@ footer {
     color: var(--text-muted);
     font-weight: 500;
 }
+
+footer a {
+    transition: all 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--primary) !important;
+    transform: translateY(-2px);
+}

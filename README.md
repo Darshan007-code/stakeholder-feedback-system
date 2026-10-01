@@ -1,5 +1,8 @@
 # 🎓 Stakeholder Feedback System
 
+**Live GitHub Pages Frontend:** [https://darshan007-code.github.io/stakeholder-feedback-system/](https://darshan007-code.github.io/stakeholder-feedback-system/)  
+**Render Deployment:** [https://edufeedback-system-jc9d.onrender.com/](https://edufeedback-system-jc9d.onrender.com/)
+
 A premium, full-stack feedback management ecosystem designed for educational institutions. This platform empowers students, parents, teachers, and employees to provide structured feedback, track complaints, and assess institutional performance through a modern, 3D-animated interface.
 
 ---
